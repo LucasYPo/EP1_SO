@@ -69,7 +69,8 @@ public class BCP implements Comparable<BCP>{
 
 	// A fazer
 	public String getCmd() {
-		return "SAIDA";
+		String rtn = comandos.get(this.pc);
+		return rtn;
 	}
 
 	public int getCreditos() {
@@ -90,6 +91,18 @@ public class BCP implements Comparable<BCP>{
 
 	public int getTimeout() {
 		return this.timeoutBloqueado;
+	}
+
+	public int getRegX() {
+		return this.regX;
+	}
+
+	public int getRegY() {
+		return this.regY;
+	}
+
+	public String getNome() {
+		return this.nome;
 	}
 
     public int compareTo(BCP comparado) {

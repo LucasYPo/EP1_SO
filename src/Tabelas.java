@@ -30,7 +30,10 @@ public class Tabelas {
 	public void downTimeout() {
 		for(BCP atual : bloqueados) {
 			atual.setTimeout(atual.getTimeout() - 1);
+		}
 
+		for(int i = 0; i < bloqueados.size(); i++) {
+			BCP atual = bloqueados.get(i);
 			if(atual.getTimeout() <= 0) {
 				bloqueados.remove(atual);
 				atual.setEstado(0);
@@ -104,5 +107,13 @@ public class Tabelas {
 		}
 
 		return true;
+	}
+
+	public boolean espera() {
+		if (prontos.size() == 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

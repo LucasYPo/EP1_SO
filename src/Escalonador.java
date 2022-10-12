@@ -2,6 +2,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Scanner;
 
 public class Escalonador {
@@ -69,7 +71,7 @@ public class Escalonador {
 
 				try {
 					FileWriter ecrt = new FileWriter(arqLog, true);
-					ecrt.write("Carregando TESTE-" + i + "\n");
+					ecrt.write("Carregando " + processo.getNome() + "\n");
 					ecrt.close();
 				} catch(IOException e) {
 					System.out.println("Não foi possível escrever no arquivo Log.");
@@ -107,11 +109,15 @@ public class Escalonador {
 		processos.sort();
 
 		while(!processos.acabou()) {
+			if(processos.espera()) {
+				processos.downTimeout();
+				continue;
+			}
 			BCP atual = processos.executar();
 			try {
 				FileWriter scrt = new FileWriter(arqLog, true);
 
-				scrt.write("Executando TESTE-" + atual.getId() + "\n");
+				scrt.write("Executando" + atual.getNome() + "\n");
 
 				scrt.close();
 			} catch(IOException e) {
@@ -121,29 +127,113 @@ public class Escalonador {
 
 			atual.downCreditos();
 
-			for(int i = 0; i < quantum; i++) {
+			for (int i = 0; i < quantum; i++) {
+				String comando = atual.getCmd();
+				int len = comando.length();
+		
+				Reader reader = new StringReader(comando);
+		
+				char[] instrucao = new char[len];
+		
+				try {
+					reader.read(instrucao);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+
+				//System.out.println("Linha " + i + ": " + instrucao[0] + " Alvo: " + atual.getId());
+		
 				atual.upPC();
 
-				String comando = atual.getCmd();
+				if (instrucao[0] == 'E') {
+				  try {
+					FileWriter scrt = new FileWriter(arqLog, true);
+					
+					scrt.write("E/S iniciada em TESTE-" + atual.getId() + "\n");
+					scrt.write("Interrompendo TESTE-" + atual.getId() + " após " + (i + 1) + " instruções\n");
+		
+					scrt.close();
+				  } catch (IOException e) {
+					System.out.println("Não foi possivel escrever no arquivo Log.");
+					e.printStackTrace();
+				  }
+		
+				  atual.setEstado(1);
+				  atual.setTimeout(quantum);
+				  break;
+				} else if (instrucao[0] == 'X') {
+				  String sValX;
+				  StringBuilder sb = new StringBuilder();
 
-				if(comando == "E/S") {
-					atual.setEstado(1);
-					break;
-				} else if(comando == "X=") {
-					//atual.setRegX();
-				} else if(comando == "Y=") {
-					//atual.setRegY();
-				} else if(comando == "SAIDA") {
+				  int count = 0;
+				  for(char a : instrucao) {
+					if(count >= 2) {
+						sb.append(a);
+					}
+					count++;
+				  }
+
+				  sValX = sb.toString();
+
+				  int valX = Integer.parseInt(sValX);
+
+				  atual.setRegX(valX);
+
+				  atual.setEstado(0);
+				} else if (instrucao[0] == 'Y') {
+					String sValY;
+					StringBuilder sb = new StringBuilder();
+  
+					int count = 0;
+					for(char a : instrucao) {
+					  if(count >= 2) {
+						  sb.append(a);
+					  }
+					  count++;
+					}
+
+					sValY = sb.toString();
+  
+					int valY = Integer.parseInt(sValY);
+  
+					atual.setRegY(valY);
+
+					atual.setEstado(0);
+				} else if (instrucao[0] == 'S') {
+				  	try{
+						FileWriter ecrt = new FileWriter(arqLog, true);
+						
+						ecrt.write(atual.getNome() + " terminado. X=" + atual.getRegX() + ". Y=" + atual.getRegY() + "\n");
+
+						ecrt.close();
+					} catch(IOException e) {
+
+					}
 					atual.setEstado(2);
-					break;
+				  	break;
+				} else {
+					atual.setEstado(0);
 				}
-			}
+			  }
 
-			processos.add(atual);
+			  if(atual.getEstado() == 0) {
+				try{
+					FileWriter ecrt = new FileWriter(arqLog, true);
 
-			processos.updateCreditos();
-			processos.downTimeout();
-			processos.sort();
+					ecrt.write("Interrompendo " + atual.getNome() + " após " + quantum + " instruções\n");
+
+					ecrt.close();
+				} catch(IOException e) {
+					System.out.println("Nao foi possível escrever no arquivo Log.");
+					e.printStackTrace();
+				}
+			  }
+
+			  processos.downTimeout();
+			  processos.add(atual);
+		
+			  processos.updateCreditos();
+			  processos.sort();
 		}
 	}
 }
