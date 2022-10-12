@@ -3,12 +3,45 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Escalonador {
 	public static void main(String[] args) {
-		ArrayList<BCP> bcpTabela = new ArrayList<>();
+		Tabelas processos = new Tabelas();
+
 		int quantum = 0;
 
+		// Lê o arquivo do quantum e atribui a variavel
+		File arqQt = new File("../programas/quantum.txt");
+
+		try {
+			Scanner ltrQt = new Scanner(arqQt);
+			quantum = Integer.parseInt(ltrQt.nextLine());
+				
+		} catch(FileNotFoundException e) {
+			System.out.println("Não foi possível ler o arquivo quantum.");
+			e.printStackTrace();
+		}
+		
+		// Cria o arquivo LogXX.txt 
+		String pathLog = "../programas/";
+		
+		if(quantum < 10) {
+			pathLog += "Log0" + quantum + ".txt";
+		} else {
+			pathLog += "Log" + quantum + ".txt";
+		}
+		
+		File arqLog = new File(pathLog);
+		
+		try {
+			arqLog.createNewFile();
+		} catch(IOException e) {
+			System.out.println("Não foi possível criar o arquivo LogXX");
+			e.printStackTrace();
+		}
+		
+		// Lê os processos nos arquivos e cria os BCPs apropriados
 		for(int i = 1; i < 11; i++) {
 			String path = "../programas/";
 			
@@ -23,58 +56,66 @@ public class Escalonador {
 
 			try {
 				Scanner ltr = new Scanner(arq);
-				Scanner ltrPrio = new Scanner(arqPrio);
 
-				int linha = 0;
+				BCP processo = new BCP(ltr.nextLine(), i);
+
 				while(ltr.hasNextLine()) {
-					String data = ltr.nextLine();
-
-					if(linha == 0) {
-						for(int k = 1; k < i; k++) {
-							ltrPrio.nextLine();
-						}
-
-						int valPrio = Integer.parseInt(ltrPrio.nextLine());
-
-						BCP processo = new BCP(data, valPrio);
-
-						bcpTabela.add(processo);
-					}
-
-					linha++;
+					processo.addCmd(ltr.nextLine() + "\n");
 				}
+				
+				processos.addNovo(processo);
+
 			} catch(FileNotFoundException e) {
 				System.out.println("Não foi possível ler o arquivo " + i );
 				e.printStackTrace();
 			}
 		}
-		
-		File arqQt = new File("../programas/quantum.txt");
+
+		// Lẽ o arquivo prioridades e atribui as variaveis
+		File arqPrio = new File("../programas/prioridades.txt");
 
 		try {
-			Scanner ltrQt = new Scanner(arqQt);
-			quantum = Integer.parseInt(ltrQt.nextLine());
+			Scanner ltrPrio = new Scanner(arqPrio);
+
+			int nmbProc = 1;
+
+			while(ltrPrio.hasNextLine()) {
+				processos.novaPrioridade(nmbProc, Integer.parseInt(ltrPrio.nextLine()));
+				
+				nmbProc++;
+			}
 		
 		} catch(FileNotFoundException e) {
-			System.out.println("Não foi possível ler o arquivo quantum.");
+			System.out.println("Não foi possível ler o arquivo prioridades.");
 			e.printStackTrace();
 		}
+		
+		processos.sort();
 
-		String pathLog = "../programas/";
+		while(!processos.acabou()) {
+			BCP atual = processos.executar();
 
-		if(quantum < 10) {
-			pathLog += "Log0" + quantum + ".txt";
-		} else {
-			pathLog += "Log" + quantum + ".txt";
-		}
+			for(int i = 0; i < quantum; i++) {
+				atual.upPC();
 
-		File arqLog = new File(pathLog);
+				if(atual.getCmd() == "E/S") {
+					processos.bloquear(atual);
+					processos.updateCreditos(atual);
+					break;
+				} else if(atual.getCmd() == "X=") {
+					processos.novoX(atual);
+				} else if(atual.getCmd() == "Y=") {
+					processos.novoY(atual);
+				} else if(atual.getCmd() == "SAIDA") {
+					processos.terminou(atual);
+					processos.updateCreditos(atual);
+					break;
+				}
 
-		try {
-			arqLog.createNewFile();
-		} catch(IOException e) {
-			System.out.println("Não foi possível criar o arquivo LogXX");
-			e.printStackTrace();
+				processos.updateCreditos(atual);
+			}
+
+			processos.downTimeout();
 		}
 	}
 }

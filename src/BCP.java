@@ -1,53 +1,76 @@
-public class BCP {
-    private String nome;
-    private String memoria;
-    private int prioridade;
-    private int regX;
-    private int regY;
-    private int pc;
+public class BCP implements Comparable<BCP>{
+	private String nome;
+	private String comandos;
+	
+	private int pc;
+	private int estado;
+	private int prioridade;
+	private int creditos;
 
-    public BCP(String nome, int prioridade) {
+	private int regX;
+	private int regY;
+
+	private int timeoutBloqueado;
+	private int id;
+
+    public BCP(String nome, int id) {
 	this.nome = nome;
-	this.prioridade = prioridade;
-	this.memoria = "";
+	this.prioridade = 0;
+	this.id = id;
+
+	this.pc = 0;
 	this.regX = 0;
 	this.regY = 0;
-	this.pc = 0;
+
+	this.estado = 0;
+	this.comandos = "";
+	this.timeoutBloqueado = 0;
+
+	this.creditos = 0;
     }
 
-    public void upPC() {
-        this.pc++;
+	public void upPC() {
+		this.pc++;
+	}
+
+    public void addCmd(String cmd) {
+    	comandos += cmd;
     }
 
-    public void setRegX(int regX) {
-        this.regX = regX;
+    public void setEstado(int estado) {
+    	this.estado = estado;
     }
 
-    public void setRegY(int regY) {
-        this.regY = regY;
+    public void setPrioridade(int prioridade) {
+    	this.prioridade = prioridade;
     }
 
-    public String getNome() {
-        return this.nome;
-    }
+	public void setRegX(int novoX) {
+		this.regX = novoX;
+	}
 
-    public String getMemoria() {
-        return this.memoria;
+	public void setRegY(int novoY) {
+		this.regY = novoY;
+	}
+
+	// A fazer
+	public String getCmd() {
+		return "";
+	}
+
+    public int getEstado() {
+    	return this.estado;
     }
 
     public int getPrioridade() {
-        return this.prioridade;
+    	return this.prioridade;
     }
 
-    public int getRegX() {
-        return this.regX;
+    public int getId() {
+    	return this.id;
     }
 
-    public int getRegY() {
-        return this.regY;
-    }
-
-    public int getPC() {
-        return this.pc;
+    public int compareTo(BCP comparado) {
+    	return comparado.getPrioridade() - this.getPrioridade();
     }
 }
