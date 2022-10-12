@@ -105,6 +105,17 @@ public class Escalonador {
 
 		while(!processos.acabou()) {
 			BCP atual = processos.executar();
+			try {
+				FileWriter scrt = new FileWriter(arqLog, true);
+
+				scrt.write("Executando TESTE-" + atual.getId() + "\n");
+
+				scrt.close();
+			} catch(IOException e) {
+				System.out.println("Não foi possível escrever no arquivo Log.");
+				e.printStackTrace();
+			}
+
 			atual.downCreditos();
 
 			for(int i = 0; i < quantum; i++) {
