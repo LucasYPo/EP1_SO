@@ -1,6 +1,8 @@
+import java.util.ArrayList;
+
 public class BCP implements Comparable<BCP>{
 	private String nome;
-	private String comandos;
+	private ArrayList<String> comandos;
 	
 	private int pc;
 	private int estado;
@@ -23,7 +25,7 @@ public class BCP implements Comparable<BCP>{
 	this.regY = 0;
 
 	this.estado = 0;
-	this.comandos = "";
+	this.comandos = new ArrayList<>();
 	this.timeoutBloqueado = 0;
 
 	this.creditos = 0;
@@ -33,8 +35,8 @@ public class BCP implements Comparable<BCP>{
 		this.pc++;
 	}
 
-    public void addCmd(String cmd) {
-    	comandos += cmd;
+    public void addCmd(String cmd, int pos) {
+    	comandos.add(pos, cmd);
     }
 
 	public void downCreditos() {

@@ -58,8 +58,11 @@ public class Escalonador {
 
 				BCP processo = new BCP(ltr.nextLine(), i);
 
+				int pos = 0;
 				while(ltr.hasNextLine()) {
-					processo.addCmd(ltr.nextLine() + "\n");
+					processo.addCmd(ltr.nextLine(), pos);
+
+					pos++;
 				}
 				
 				processos.add(processo);
