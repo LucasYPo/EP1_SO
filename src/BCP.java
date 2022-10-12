@@ -37,6 +37,14 @@ public class BCP implements Comparable<BCP>{
     	comandos += cmd;
     }
 
+	public void downCreditos() {
+		this.creditos--;
+	}
+
+	public void setCreditos() {
+		this.creditos = this.prioridade;
+	}
+
     public void setEstado(int estado) {
     	this.estado = estado;
     }
@@ -53,9 +61,17 @@ public class BCP implements Comparable<BCP>{
 		this.regY = novoY;
 	}
 
+	public void setTimeout(int quantum) {
+		this.timeoutBloqueado = quantum;
+	}
+
 	// A fazer
 	public String getCmd() {
-		return "";
+		return "SAIDA";
+	}
+
+	public int getCreditos() {
+		return this.creditos;
 	}
 
     public int getEstado() {
@@ -69,6 +85,10 @@ public class BCP implements Comparable<BCP>{
     public int getId() {
     	return this.id;
     }
+
+	public int getTimeout() {
+		return this.timeoutBloqueado;
+	}
 
     public int compareTo(BCP comparado) {
     	return comparado.getPrioridade() - this.getPrioridade();

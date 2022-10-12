@@ -52,7 +52,6 @@ public class Escalonador {
 			}
 
 			File arq = new File(path);
-			File arqPrio = new File("../programas/prioridades.txt");
 
 			try {
 				Scanner ltr = new Scanner(arq);
@@ -63,7 +62,7 @@ public class Escalonador {
 					processo.addCmd(ltr.nextLine() + "\n");
 				}
 				
-				processos.addNovo(processo);
+				processos.add(processo);
 
 			} catch(FileNotFoundException e) {
 				System.out.println("Não foi possível ler o arquivo " + i );
@@ -90,32 +89,36 @@ public class Escalonador {
 			e.printStackTrace();
 		}
 		
+		processos.updateCreditos();
 		processos.sort();
 
 		while(!processos.acabou()) {
 			BCP atual = processos.executar();
+			atual.downCreditos();
 
 			for(int i = 0; i < quantum; i++) {
 				atual.upPC();
 
-				if(atual.getCmd() == "E/S") {
-					processos.bloquear(atual);
-					processos.updateCreditos(atual);
+				String comando = atual.getCmd();
+
+				if(comando == "E/S") {
+					atual.setEstado(1);
 					break;
-				} else if(atual.getCmd() == "X=") {
-					processos.novoX(atual);
-				} else if(atual.getCmd() == "Y=") {
-					processos.novoY(atual);
-				} else if(atual.getCmd() == "SAIDA") {
-					processos.terminou(atual);
-					processos.updateCreditos(atual);
+				} else if(comando == "X=") {
+					//atual.setRegX();
+				} else if(comando == "Y=") {
+					//atual.setRegY();
+				} else if(comando == "SAIDA") {
+					atual.setEstado(2);
 					break;
 				}
-
-				processos.updateCreditos(atual);
 			}
 
+			processos.add(atual);
+
+			processos.updateCreditos();
 			processos.downTimeout();
+			processos.sort();
 		}
 	}
 }
