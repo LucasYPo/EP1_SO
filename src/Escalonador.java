@@ -1,9 +1,8 @@
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class Escalonador {
 	public static void main(String[] args) {
@@ -18,6 +17,7 @@ public class Escalonador {
 			Scanner ltrQt = new Scanner(arqQt);
 			quantum = Integer.parseInt(ltrQt.nextLine());
 				
+			ltrQt.close();
 		} catch(FileNotFoundException e) {
 			System.out.println("Não foi possível ler o arquivo quantum.");
 			e.printStackTrace();
@@ -64,6 +64,16 @@ public class Escalonador {
 				
 				processos.add(processo);
 
+				try {
+					FileWriter ecrt = new FileWriter(arqLog, true);
+					ecrt.write("Carregando TESTE-" + i + "\n");
+					ecrt.close();
+				} catch(IOException e) {
+					System.out.println("Não foi possível escrever no arquivo Log.");
+					e.printStackTrace();
+				}
+
+				ltr.close();
 			} catch(FileNotFoundException e) {
 				System.out.println("Não foi possível ler o arquivo " + i );
 				e.printStackTrace();
@@ -84,6 +94,7 @@ public class Escalonador {
 				nmbProc++;
 			}
 		
+			ltrPrio.close();
 		} catch(FileNotFoundException e) {
 			System.out.println("Não foi possível ler o arquivo prioridades.");
 			e.printStackTrace();

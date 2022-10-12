@@ -91,6 +91,6 @@ public class BCP implements Comparable<BCP>{
 	}
 
     public int compareTo(BCP comparado) {
-    	return comparado.getPrioridade() - this.getPrioridade();
+    	return comparado.getCreditos() - this.getCreditos();
     }
 }
