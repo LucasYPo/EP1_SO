@@ -1,13 +1,13 @@
-Carregando TESTE-1
-Carregando TESTE-2
-Carregando TESTE-3
-Carregando TESTE-4
-Carregando TESTE-5
-Carregando TESTE-6
 Carregando TESTE-7
+Carregando TESTE-4
 Carregando TESTE-8
 Carregando TESTE-9
+Carregando TESTE-6
+Carregando TESTE-5
 Carregando TESTE-10
+Carregando TESTE-2
+Carregando TESTE-3
+Carregando TESTE-1
 ExecutandoTESTE-7
 Interrompendo TESTE-7 após 3 instruções
 ExecutandoTESTE-7

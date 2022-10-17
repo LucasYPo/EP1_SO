@@ -10,6 +10,14 @@ public class Escalonador {
 	public static void main(String[] args) {
 		Tabelas processos = new Tabelas();
 
+		float mediaTrocas = 0;
+		float mediaInstru = 0;
+
+		float qntInstru = 0;
+		float qntInterrup = 0;
+		float qntTrocas = 0;
+		float tempo = 0;
+
 		int quantum = 0;
 
 		// Lê o arquivo do quantum e atribui a variavel
@@ -69,15 +77,6 @@ public class Escalonador {
 				
 				processos.add(processo);
 
-				try {
-					FileWriter ecrt = new FileWriter(arqLog, true);
-					ecrt.write("Carregando " + processo.getNome() + "\n");
-					ecrt.close();
-				} catch(IOException e) {
-					System.out.println("Não foi possível escrever no arquivo Log.");
-					e.printStackTrace();
-				}
-
 				ltr.close();
 			} catch(FileNotFoundException e) {
 				System.out.println("Não foi possível ler o arquivo " + i );
@@ -108,12 +107,25 @@ public class Escalonador {
 		processos.updateCreditos();
 		processos.sort();
 
+		try {
+			FileWriter ecrt = new FileWriter(arqLog, true);
+			for(BCP atual : processos.getTodos()) {
+				ecrt.write("Carregando " + atual.getNome() + "\n");
+			}
+			ecrt.close();
+		} catch(IOException e) {
+			System.out.println("Não foi possível escrever no arquivo Log.");
+			e.printStackTrace();
+		}
+
 		while(!processos.acabou()) {
 			if(processos.espera()) {
 				processos.downTimeout();
+				tempo++;
 				continue;
 			}
 			BCP atual = processos.executar();
+			qntInstru = 0;
 			try {
 				FileWriter scrt = new FileWriter(arqLog, true);
 
@@ -128,6 +140,8 @@ public class Escalonador {
 			atual.downCreditos();
 
 			for (int i = 0; i < quantum; i++) {
+				qntInstru++;
+				tempo++;
 				String comando = atual.getCmd();
 				int len = comando.length();
 		
@@ -146,6 +160,9 @@ public class Escalonador {
 				atual.upPC();
 
 				if (instrucao[0] == 'E') {
+					qntTrocas++;
+					mediaInstru += qntInstru;
+					qntInterrup++;
 				  try {
 					FileWriter scrt = new FileWriter(arqLog, true);
 					
@@ -200,6 +217,9 @@ public class Escalonador {
 
 					atual.setEstado(0);
 				} else if (instrucao[0] == 'S') {
+					qntTrocas++;
+					mediaInstru += qntInstru;
+					qntInterrup++;
 				  	try{
 						FileWriter ecrt = new FileWriter(arqLog, true);
 						
@@ -217,6 +237,9 @@ public class Escalonador {
 			  }
 
 			  if(atual.getEstado() == 0) {
+				  qntTrocas++;
+				  mediaInstru += qntInstru;
+				  qntInterrup++;
 				try{
 					FileWriter ecrt = new FileWriter(arqLog, true);
 
@@ -235,5 +258,11 @@ public class Escalonador {
 			  processos.updateCreditos();
 			  processos.sort();
 		}
+
+		mediaTrocas = qntTrocas / tempo;
+		mediaInstru = mediaInstru / qntInterrup;
+
+		System.out.println("A media de trocas é " + mediaTrocas);
+		System.out.println("A media de instruções é: " + mediaInstru);
 	}
 }

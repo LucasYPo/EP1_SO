@@ -116,4 +116,8 @@ public class Tabelas {
 			return false;
 		}
 	}
+
+	public ArrayList<BCP> getTodos() {
+		return this.todos;
+	}
 }
